@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import wiw.Wiw;
 import wiw.WiwException;
 import wiw.internal.org.json.JSONArray;
 import wiw.internal.org.json.JSONException;
@@ -93,7 +94,7 @@ public class Swap implements RequestItem, java.io.Serializable {
 				actionable = json.getBoolean("actionable");
 			
 			try {
-				DateFormat df = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss");
+				DateFormat df = new SimpleDateFormat(Wiw.DATE_FORMAT, Wiw.DATE_LOCALE);
 				created = df.parse(json.getString("created"));
 			} catch (ParseException e) {
 				throw new WiwException(e);

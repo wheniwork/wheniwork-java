@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import android.util.Log;
 
+import wiw.Wiw;
 import wiw.WiwException;
 import wiw.internal.org.json.JSONArray;
 import wiw.internal.org.json.JSONException;
@@ -74,7 +74,7 @@ public class Request implements RequestItem, java.io.Serializable {
 				actionable = json.getBoolean("actionable");
 
 			try {
-				DateFormat df = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss");
+				DateFormat df = new SimpleDateFormat(Wiw.DATE_FORMAT, Wiw.DATE_LOCALE);
 				start = df.parse(json.getString("start"));
 				end = df.parse(json.getString("end"));
 				

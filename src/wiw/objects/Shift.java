@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import wiw.Wiw;
 import wiw.WiwException;
 import wiw.internal.org.json.JSONArray;
 import wiw.internal.org.json.JSONException;
@@ -16,8 +17,6 @@ import wiw.internal.org.json.JSONObject;
 public class Shift implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 885436461805363874L;
-	
-	private static final String DATE_FORMAT = "E, dd MMM yyyy kk:mm:ss";
 	
 	private long id;
 	private String instance_id;
@@ -92,7 +91,7 @@ public class Shift implements java.io.Serializable {
 			}
 
 			try {
-				DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+				DateFormat df = new SimpleDateFormat(Wiw.DATE_FORMAT, Wiw.DATE_LOCALE);
 				start = df.parse(json.getString("start"));
 				end = df.parse(json.getString("end"));
 			} catch (ParseException e) {
@@ -176,7 +175,7 @@ public class Shift implements java.io.Serializable {
 
     public JSONObject toJSON() {
     	JSONObject j = new JSONObject();
-		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+		DateFormat df = new SimpleDateFormat(Wiw.DATE_FORMAT, Wiw.DATE_LOCALE);
     	try {
 			j.put("id", id);
 	    	j.put("instance_id", instance_id);

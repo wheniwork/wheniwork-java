@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import wiw.Wiw;
 import wiw.WiwException;
 import wiw.internal.org.json.JSONException;
 import wiw.internal.org.json.JSONObject;
@@ -30,7 +31,7 @@ public class Parameters implements java.io.Serializable {
 		try {
 			
 			try {
-				DateFormat df = new SimpleDateFormat("E, dd MMM yyyy kk:mm:ss");
+				DateFormat df = new SimpleDateFormat(Wiw.DATE_FORMAT, Wiw.DATE_LOCALE);
 				
 				if(!json.isNull("start"))
 					start = df.parse(json.getString("start"));

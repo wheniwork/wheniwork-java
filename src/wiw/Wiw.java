@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -31,7 +32,12 @@ import wiw.objects.Swap;
 import wiw.objects.User;
 
 public class Wiw {
+
+	// Format Example: Mon, 26 Sep 2011 12:15:03
+	public static final String DATE_FORMAT = "E, dd MMM yyyy HH:mm:ss";
+	public static final Locale DATE_LOCALE = Locale.US;
 	
+
 	private Configuration conf;
 	
 	public Wiw(Configuration conf) {
