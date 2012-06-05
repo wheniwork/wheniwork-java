@@ -90,22 +90,30 @@ public class AsyncWiw {
 		} );
 	}
 	
-	public void createShift(Date start, Date end, long userId, long locationId, long positionId, int color) {
-		createShift(start, end, userId, locationId, positionId, color, false, null);
+	public void createShift(Date start, Date end, long userId, long locationId, long positionId, int color, String notes) {
+		createShift(start, end, userId, locationId, positionId, color, notes, false);
 	}
-	public void createShift(final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final boolean repeat, final Date until) {
+	public void createShift(final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final String notes, final boolean published) {
 		getDispatcher().invokeLater( new AsyncTask(WiwMethod.CREATE_SHIFT, this.listener) {
 			@Override
 			public void invoke(WiwListener listener) throws WiwException {
-				listener.createdShift(wiw.createShift(start, end, userId, locationId, positionId, color, repeat, until));
+				listener.createdShift(wiw.createShift(start, end, userId, locationId, positionId, color, notes, published));
 			}
 		} );
 	}
-	public void updateShift(final String shift_intance_id, final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final boolean repeat, final Date until) {
+	public void updateShift(final long shift_intance_id, final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final String notes, final boolean published) {
 		getDispatcher().invokeLater( new AsyncTask(WiwMethod.UPDATE_SHIFT, this.listener) {
 			@Override
 			public void invoke(WiwListener listener) throws WiwException {
-				listener.updatedShift(wiw.updateShift(shift_intance_id, start, end, userId, locationId, positionId, color, repeat, until));
+				listener.updatedShift(wiw.updateShift(shift_intance_id, start, end, userId, locationId, positionId, color, notes, published));
+			}
+		} );
+	}	
+	public void updateShiftPublish(final long shift_id, final boolean published) {
+		getDispatcher().invokeLater( new AsyncTask(WiwMethod.UPDATE_SHIFT, this.listener) {
+			@Override
+			public void invoke(WiwListener listener) throws WiwException {
+				listener.updatedShift(wiw.updateShiftPublish(shift_id, published));
 			}
 		} );
 	}	

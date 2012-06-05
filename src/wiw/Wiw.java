@@ -179,13 +179,13 @@ public class Wiw {
 		}
 	}
 	
-	public Shift createShift(Date start, Date end, long userId, long locationId, long positionId, int color) throws WiwException {
-		return createShift(start, end, userId, locationId, positionId, color, false, null);
+	public Shift createShift(Date start, Date end, long userId, long locationId, long positionId, int color, String notes) throws WiwException {
+		return createShift(start, end, userId, locationId, positionId, color, notes, false);
 	}
-	public Shift createShift(Date start, Date end, long userId, long locationId, long positionId, int color, boolean repeat, Date until) throws WiwException {
-		return updateShift(null, start, end, userId, locationId, positionId, color, repeat, until);
+	public Shift createShift(Date start, Date end, long userId, long locationId, long positionId, int color, String notes, boolean published) throws WiwException {
+		return updateShift(0, start, end, userId, locationId, positionId, color, notes, published);
 	}
-	public Shift updateShift(String shift_instance_id, Date start, Date end, long userId, long locationId, long positionId, int color, boolean repeat, Date until) throws WiwException {
+	public Shift updateShift(long shift_id, Date start, Date end, long userId, long locationId, long positionId, int color, String notes, boolean published) throws WiwException {
 		
 		List<NameValuePair> requestparams = new ArrayList<NameValuePair>();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -194,9 +194,10 @@ public class Wiw {
 		requestparams.add(new BasicNameValuePair("location_id", String.valueOf(locationId)));
 		requestparams.add(new BasicNameValuePair("position_id", String.valueOf(positionId)));
 		requestparams.add(new BasicNameValuePair("user_id", String.valueOf(userId)));
+		requestparams.add(new BasicNameValuePair("notes", notes));
 
 		requestparams.add(new BasicNameValuePair("color", Integer.toHexString(color)));
-		if(repeat == true) {
+		/*if(repeat == true) {
 			if(until != null) {
 				requestparams.add(new BasicNameValuePair("repeat", df.format(until)));
 			} else {
@@ -204,12 +205,14 @@ public class Wiw {
 			}
 		} else {
 			requestparams.add(new BasicNameValuePair("repeat", "false"));
-		}
+		}*/
+		
+		requestparams.add(new BasicNameValuePair("published", String.valueOf(published)));
 		
 		JSONObject json;
 		
-		if(shift_instance_id != null && shift_instance_id.length()>0) {
-			requestparams.add(new BasicNameValuePair("id", shift_instance_id));
+		if(shift_id>0) {
+			requestparams.add(new BasicNameValuePair("id", String.valueOf(shift_id)));
 			json = new WiwRequest(conf).JSONRequest("/shifts/update.json", requestparams, RequestMethod.POST);
 		} else {
 			json = new WiwRequest(conf).JSONRequest("/shifts/create.json", requestparams, RequestMethod.POST);
@@ -221,6 +224,29 @@ public class Wiw {
 			throw new WiwException(e);
 		}
 	}
+
+	public Shift updateShiftPublish(long shift_id, boolean published) throws WiwException {
+		
+		List<NameValuePair> requestparams = new ArrayList<NameValuePair>();
+		
+		requestparams.add(new BasicNameValuePair("published", String.valueOf(published)));
+		
+		JSONObject json;
+		
+		if(shift_id<=0) {
+			throw new WiwException("Error updating non-existent shift.", "PEBKAC");
+		}
+		
+		requestparams.add(new BasicNameValuePair("id", String.valueOf(shift_id)));
+		json = new WiwRequest(conf).JSONRequest("/shifts/update.json", requestparams, RequestMethod.POST);
+		
+		try {
+			return new Shift(json.getJSONObject("shift"));
+		} catch (JSONException e) {
+			throw new WiwException(e);
+		}
+	}
+
 	
 	/** DESTROY SHIFT
 	 * @return Shift

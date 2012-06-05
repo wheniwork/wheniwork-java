@@ -30,6 +30,7 @@ public class Shift implements java.io.Serializable {
 	private int color;
 	private String notes;
 	private boolean actionable = false;
+	private boolean published = false;
 	
 	private long[] linked_users;
 	
@@ -99,6 +100,7 @@ public class Shift implements java.io.Serializable {
 			}
 
 			color = Integer.parseInt(json.getString("color"), 16)+0xFF000000;
+			published = json.getBoolean("published");
 			
 			if(!json.isNull("notes")) {
 				notes = json.getString("notes");
@@ -153,7 +155,11 @@ public class Shift implements java.io.Serializable {
 	public int getColor() {
 		return color;
 	}
-
+	
+	public boolean isPublished() {
+		return published;
+	}
+	
 	public String getNotes() {
 		return notes;
 	}
@@ -187,6 +193,7 @@ public class Shift implements java.io.Serializable {
 	    	j.put("repeat", repeat);
 	    	j.put("repeat_until", df.format(repeat_until));
 	    	j.put("color", String.valueOf(color-0xFF000000));
+	    	j.put("published", published);
 	    	j.put("actionable", actionable);
 	    	j.put("notes", notes);
 	    	if(linked_users != null) {
