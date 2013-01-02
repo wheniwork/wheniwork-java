@@ -7,6 +7,7 @@ public class WiwAdapter implements WiwListener {
 	
 	/** AUTH **/
 	public void authorized(Object user) { }
+	public void authorized2(Object user) { }
 	
 	/** SHIFTS **/
 	public void gotShifts(List<Shift> shifts) { }
@@ -47,6 +48,10 @@ public class WiwAdapter implements WiwListener {
 	/** LOCATIONS **/
 	public void gotLocations(List<Location> locations) { }
 	public void gotShowLocation(Location location) { }
+
+	/** SITES **/
+	public void gotSites(List<Site> locations) { }
+	public void gotShowSite(Site location) { }
 
 	public void onException(WiwException e, WiwMethod method) { }
 

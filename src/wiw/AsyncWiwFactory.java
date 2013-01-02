@@ -13,6 +13,11 @@ public class AsyncWiwFactory {
 		return request;
 	}
 	
+	public AsyncWiw getInstance(String token) {
+		AsyncWiw request = new AsyncWiw(token);
+		request.setListener(this.listener);
+		return request;
+	}
 	public AsyncWiw getInstance(WiwToken token) {
 		AsyncWiw request = new AsyncWiw(token);
 		request.setListener(this.listener);

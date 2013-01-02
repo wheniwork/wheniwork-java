@@ -39,7 +39,12 @@ public class Account implements java.io.Serializable {
 		
 		try {
 			id = json.getLong("id");
-			name = json.getString("name");
+			name = json.optString("name").trim();
+			
+			if(name.length() == 0) {
+				name = json.optString("company");
+			}
+			
 			subdomain = json.getString("subdomain");
 		} catch (JSONException e) {
 			throw new WiwException(e);

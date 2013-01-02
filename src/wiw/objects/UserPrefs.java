@@ -26,10 +26,10 @@ public class UserPrefs implements java.io.Serializable {
 				alerts = new AlertSettings(json.getJSONObject("alerts"));
 			}
 			
-			reminder_time = json.getDouble("reminder_time");
+			reminder_time = json.optDouble("reminder_time");
 			
-			sleep_start = json.getString("sleep_start");
-			sleep_end = json.getString("sleep_end");
+			sleep_start = json.optString("sleep_start");
+			sleep_end = json.optString("sleep_end");
 			
 		} catch (JSONException e) {
 			throw new WiwException(e);

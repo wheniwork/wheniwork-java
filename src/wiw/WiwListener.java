@@ -7,6 +7,7 @@ public interface WiwListener {
 
 	/** AUTH **/
 	void authorized(Object user);
+	void authorized2(Object user);
 	
 	/** SHIFTS **/
 	void gotShifts(List<Shift> shifts);
@@ -43,9 +44,13 @@ public interface WiwListener {
 	void gotPositions(List<Position> positions);
 	void gotShowPosition(Position position);
 
-	/** POSITIONS **/
+	/** LOCATIONS **/
 	void gotLocations(List<Location> locations);
 	void gotShowLocation(Location location);
+
+	/** SITES **/
+	void gotSites(List<Site> locations);
+	void gotShowSite(Site location);
 
 	void onException(WiwException e, WiwMethod method);
 	

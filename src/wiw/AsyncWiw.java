@@ -32,6 +32,15 @@ public class AsyncWiw {
 		wiw = new Wiw(this.conf);
 	}
 
+	public AsyncWiw(String token) {
+		Configuration conf = new Configuration();
+		conf.setAuthType(AuthType.KEY_V2);
+		conf.setKeyToken(token);
+		
+		this.conf = conf;
+		wiw = new Wiw(this.conf);
+	}
+
 	public AsyncWiw(WiwToken token) {
 		Configuration conf = new Configuration();
 		conf.setAuthType(AuthType.OAUTH);
@@ -41,6 +50,11 @@ public class AsyncWiw {
 		wiw = new Wiw(this.conf);
 	}
 
+	
+	public boolean isNew() {
+		return this.conf.isNew();
+	}
+	
 	public void setListener(WiwListener listener) {
 		this.listener = listener;
 	}
@@ -54,7 +68,24 @@ public class AsyncWiw {
 			}
 		} );
 	}
-	
+
+	public void authorize2() {
+		getDispatcher().invokeLater( new AsyncTask(WiwMethod.AUTHORIZE, this.listener) {
+			@Override
+			public void invoke(WiwListener listener) throws WiwException {
+				listener.authorized2(wiw.authorize2());
+			}
+		} );
+	}
+	public void authorize2(final long account_id) {
+		getDispatcher().invokeLater( new AsyncTask(WiwMethod.AUTHORIZE, this.listener) {
+			@Override
+			public void invoke(WiwListener listener) throws WiwException {
+				listener.authorized2(wiw.authorize2(account_id));
+			}
+		} );
+	}
+
 	public Configuration getConfiguration() {
 		return conf;
 	}
@@ -91,21 +122,21 @@ public class AsyncWiw {
 	}
 	
 	public void createShift(Date start, Date end, long userId, long locationId, long positionId, int color, String notes) {
-		createShift(start, end, userId, locationId, positionId, color, notes, false);
+		createShift(start, end, userId, locationId, positionId, color, notes, false, 0);
 	}
-	public void createShift(final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final String notes, final boolean published) {
+	public void createShift(final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final String notes, final boolean published, final long siteId) {
 		getDispatcher().invokeLater( new AsyncTask(WiwMethod.CREATE_SHIFT, this.listener) {
 			@Override
 			public void invoke(WiwListener listener) throws WiwException {
-				listener.createdShift(wiw.createShift(start, end, userId, locationId, positionId, color, notes, published));
+				listener.createdShift(wiw.createShift(start, end, userId, locationId, positionId, color, notes, published, siteId));
 			}
 		} );
 	}
-	public void updateShift(final long shift_intance_id, final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final String notes, final boolean published) {
+	public void updateShift(final long shift_intance_id, final Date start, final Date end, final long userId, final long locationId, final long positionId, final int color, final String notes, final boolean published, final long siteId) {
 		getDispatcher().invokeLater( new AsyncTask(WiwMethod.UPDATE_SHIFT, this.listener) {
 			@Override
 			public void invoke(WiwListener listener) throws WiwException {
-				listener.updatedShift(wiw.updateShift(shift_intance_id, start, end, userId, locationId, positionId, color, notes, published));
+				listener.updatedShift(wiw.updateShift(shift_intance_id, start, end, userId, locationId, positionId, color, notes, published, siteId));
 			}
 		} );
 	}	
@@ -401,6 +432,29 @@ public class AsyncWiw {
 		} );
 	}
 	
+	
+	/********************************************************************************
+	 * SITE METHODS
+	 */
+	
+	public void getSites() {
+		getDispatcher().invokeLater( new AsyncTask(WiwMethod.SITES, this.listener) {
+			@Override
+			public void invoke(WiwListener listener) throws WiwException {
+				listener.gotSites(wiw.getSites());
+			}
+		} );
+	}
+	
+	public void showSite(final long id) {
+		getDispatcher().invokeLater( new AsyncTask(WiwMethod.SHOW_SITE, this.listener) {
+			@Override
+			public void invoke(WiwListener listener) throws WiwException {
+				listener.gotShowSite(wiw.showSite(id));
+			}
+		} );
+	}
+
 	
 	
     private static transient Dispatcher dispatcher;

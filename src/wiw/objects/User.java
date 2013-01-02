@@ -1,10 +1,15 @@
 package wiw.objects;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
+import android.util.Log;
+
+import wiw.Wiw;
 import wiw.WiwException;
 import wiw.WiwToken;
+import wiw.Wiw.TableType;
 import wiw.internal.org.json.JSONArray;
 import wiw.internal.org.json.JSONException;
 import wiw.internal.org.json.JSONObject;
@@ -21,17 +26,23 @@ public class User implements java.io.Serializable {
 	private String phone_number;
 	private Role role;
 	
+	private boolean deleted;
 	private boolean hidden;
 	
 	private List<Position> positions = null;
 	private List<Location> locations = null;
 	
 	private WiwToken token;
+	private String key_token;
 	
 	private String avatar_url;
 	
 	private UserPrefs preferences;
 
+	
+	private transient Hashtable<Integer, JSONObject> _positions = new Hashtable<Integer, JSONObject>();
+	private transient Hashtable<Integer, JSONObject> _locations = new Hashtable<Integer, JSONObject>();
+	
 	public static enum Role {
 		ADMIN, MANAGER, SUPERVISOR, LEADER, EMPLOYEE, VIEWER
 	}
@@ -40,8 +51,9 @@ public class User implements java.io.Serializable {
 		try {
 			JSONArray users = json.getJSONArray("users");
 			List<User> list = new ArrayList<User>();
+			
 			for(int i=0; i<users.length(); i++) {
-				list.add(new User(users.getJSONObject(i)));
+				list.add(new User(users.getJSONObject(i), json));
 			}
 			return list;
 		} catch (JSONException e) {
@@ -49,46 +61,86 @@ public class User implements java.io.Serializable {
 		}
 	}
 
-	public User(JSONObject json) throws WiwException {
-		init(json);
+	public User(JSONObject json, JSONObject global) throws WiwException {
+		init(json, global);
 	}
 
-	private void init(JSONObject json) throws WiwException {
+	private void init(JSONObject json, JSONObject global) throws WiwException {
+		if(json == null) {
+			Log.e("USER", "No user found. Probably an open shift.");
+			return;
+		}
+		
+		if(global != null) {
+			_positions = Wiw.getHashTable(global, "positions", TableType.POSITIONS);
+			_locations = Wiw.getHashTable(global, "locations", TableType.LOCATIONS);
+		}
 		
 		try {
+			
 			
 			id = json.getLong("id");
 			first_name = json.getString("first_name");
 			last_name = json.getString("last_name");
-			email = json.getString("email");
-			phone_number = json.getString("phone_number");
+			email = json.optString("email");
+			phone_number = json.optString("phone_number");
 			
 			preferences = new UserPrefs(json);
 
-			avatar_url = json.getString("avatar_url");
-			
-			String rol = json.getString("role");
-			if(rol.contentEquals("admin")) {
-				role = Role.ADMIN;
-			} else if(rol.contentEquals("manager")) {
-				role = Role.MANAGER;
-			} else if(rol.contentEquals("supervisor")) {
-				role = Role.SUPERVISOR;
-			} else if(rol.contentEquals("leader")) {
-				role = Role.LEADER;
-			} else if(rol.contentEquals("employee")) {
-				role = Role.EMPLOYEE;
-			} else {
-				role = Role.VIEWER;
+			if(json.isNull("avatar_url")) {
+				avatar_url = json.getJSONObject("avatar").getString("url").replace("%s", "128");
+			}
+			else {
+				avatar_url = json.getString("avatar_url");
 			}
 			
-			hidden = json.getBoolean("hidden");
+			if(!json.isNull("role")) {
+				Object _role = json.get("role");
+				if(_role instanceof String) {
+					String rol = (String) _role;
+					if(rol.contentEquals("admin")) {
+						role = Role.ADMIN;
+					} else if(rol.contentEquals("manager")) {
+						role = Role.MANAGER;
+					} else if(rol.contentEquals("supervisor")) {
+						role = Role.SUPERVISOR;
+					} else if(rol.contentEquals("leader")) {
+						role = Role.LEADER;
+					} else if(rol.contentEquals("employee")) {
+						role = Role.EMPLOYEE;
+					} else {
+						role = Role.VIEWER;
+					}
+				} else {
+					int r = (Integer) _role;
+					if(r == 1) role = Role.ADMIN;
+					else if(r == 2) role = Role.MANAGER;
+					else if(r == 3) role = Role.EMPLOYEE;
+					else if(r == 5) role = Role.SUPERVISOR;
+				}
+			}
 			
+			if(!json.isNull("hidden")) {
+				hidden = json.getBoolean("hidden");
+				deleted = false;
+			}
+			else {
+				hidden = json.optBoolean("is_hidden");
+				deleted = json.optBoolean("is_deleted");
+			}
 			if(!json.isNull("positions")) {
 				JSONArray parr = json.getJSONArray("positions");
 				positions = new ArrayList<Position>();
 				for(int i=0; i<parr.length(); i++) {
-					positions.add(new Position(parr.getJSONObject(i)));
+					Object pos = parr.get(i);
+					if(pos instanceof JSONObject) {
+						positions.add(new Position(parr.getJSONObject(i)));
+					} else {
+						JSONObject _p = _positions.get(parr.getInt(i));
+						if(_p != null)
+							positions.add(new Position(_p));
+					}
+					
 				}
 			}
 
@@ -96,7 +148,14 @@ public class User implements java.io.Serializable {
 				JSONArray larr = json.getJSONArray("locations");
 				locations = new ArrayList<Location>();
 				for(int i=0; i<larr.length(); i++) {
-					locations.add(new Location(larr.getJSONObject(i)));
+					Object loc = larr.get(i);
+					if(loc instanceof JSONObject) {
+						locations.add(new Location(larr.getJSONObject(i)));
+					} else {
+						JSONObject _l = _locations.get(larr.getInt(i));
+						if(_l != null)
+							locations.add(new Location(_l));
+					}
 				}
 			}
 			
@@ -144,6 +203,10 @@ public class User implements java.io.Serializable {
 		return hidden;
 	}
 	
+	public boolean isDeleted() {
+		return deleted;
+	}
+	
 	public String getAvatarUrl() {
 		return avatar_url;
 	}
@@ -161,6 +224,14 @@ public class User implements java.io.Serializable {
 	public void setToken(WiwToken token) {
 		this.token = token;
 	}
+	
+	public void setKeyToken(String token) {
+		this.key_token = token;
+	}
+	public String getKeyToken() {
+		return key_token;
+	}
+	
 	
 	public WiwToken getToken() {
 		return this.token;

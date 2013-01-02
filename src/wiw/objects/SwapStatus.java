@@ -31,7 +31,6 @@ public class SwapStatus implements java.io.Serializable {
 	private void init(JSONObject json) throws WiwException {
 		
 		try {
-			id = json.getLong("id");
 			
 			if(!json.isNull("date")) {
 				try {
@@ -42,10 +41,21 @@ public class SwapStatus implements java.io.Serializable {
 				}
 			}
 
+			if(json.isNull("user_id")) {
+				id = json.getLong("id");
+				
+			} else {
+				if(json.getLong("shift_id") > 0) {
+					id = json.getLong("shift_id");
+				} else {
+					id = json.getLong("user_id");
+				}
+			}
+
 			String stat = json.getString("status");
-			if(stat.contentEquals("approved")) {
+			if(stat.contentEquals("approved") || stat.contentEquals("1")) {
 				status = Status.APPROVED;
-			} else if(stat.contentEquals("declined")) {
+			} else if(stat.contentEquals("declined") || stat.contentEquals("2")) {
 				status = Status.DECLINED;
 			} else {
 				status = Status.PENDING;

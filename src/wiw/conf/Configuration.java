@@ -14,17 +14,24 @@ public class Configuration implements DispatcherConfiguration {
 	private String username;
 	private String password;
 	
+	private String key_token;
+	
 	private WiwToken token;
 	private WiwToken consumerToken;
+	
+	private String applicationKey;
 	
 	private Parameters requestParameters;
 	
 	private String host;
 	
 	public enum AuthType {
-		BASIC, OAUTH
+		BASIC, OAUTH, KEY_V2
 	}
 	
+	public boolean isNew() {
+		return this.authType == AuthType.KEY_V2;
+	}
 	
 	public void setToken(WiwToken tkn) {
 		this.token = tkn;
@@ -32,7 +39,18 @@ public class Configuration implements DispatcherConfiguration {
 	public WiwToken getToken() {
 		return this.token;
 	}
-
+	
+	public String getKeyToken() {
+		return this.key_token;
+	}
+	
+	public void setApplicationKey(String key) {
+		this.applicationKey = key;
+	}
+	public String getApplicationKey() {
+		return this.applicationKey;
+	}
+	
 	public void setConsumerToken(WiwToken tkn) {
 		this.consumerToken = tkn;
 	}
@@ -56,6 +74,11 @@ public class Configuration implements DispatcherConfiguration {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public void setKeyToken(String key) {
+		this.key_token = key;
+	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -79,7 +102,9 @@ public class Configuration implements DispatcherConfiguration {
 	public Configuration() {
 		
 		setConsumerToken(new WiwToken(System.getProperty("wiw.oauth.consumerKey", ""),System.getProperty("wiw.oauth.consumerSecret","")));
-
+		
+		setApplicationKey(System.getProperty("wiw.auth.applicationKey"));
+		
 		setDispatcherImpl("wiw.internal.async.DispatcherImpl");
 		setAsyncNumThreads(1);
 	}

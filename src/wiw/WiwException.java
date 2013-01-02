@@ -11,6 +11,7 @@ public class WiwException extends Exception {
 	
 	private String _errorMessage = "";
 	private int _errorCode = 1;
+	private int _httpstatus = 200;
 	
 	public WiwException(Exception cause) {
         super(cause);
@@ -32,6 +33,13 @@ public class WiwException extends Exception {
         this._errorCode = Integer.valueOf(res);
     }
 
+    public WiwException(String msg, String res, int httpstatus) {
+        super(getCause(res) + "\n" + msg);
+        this._errorMessage = msg;
+        this._errorCode = Integer.valueOf(res);
+        this._httpstatus = httpstatus;
+    }
+
     
     public String getServerMessage() {
     	return this._errorMessage;
@@ -47,6 +55,10 @@ public class WiwException extends Exception {
     
     public int getCode() {
     	return this._errorCode;
+    }
+
+    public int getHttpStatus() {
+    	return this._httpstatus;
     }
 
     private static String getCause(String res) {

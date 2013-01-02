@@ -98,6 +98,10 @@ public final class WiwMethod implements java.io.Serializable {
     public static final WiwMethod LOCATIONS = new WiwMethod("LOCATIONS");  
     public static final WiwMethod SHOW_LOCATION = new WiwMethod("SHOW_LOCATION");  
 
+    /** SITE METHODS **/
+    public static final WiwMethod SITES = new WiwMethod("SITES");  
+    public static final WiwMethod SHOW_SITE = new WiwMethod("SHOW_SITE");  
+
     /*Help Methods*/
     public static final WiwMethod TEST = new WiwMethod("TEST");
 }
